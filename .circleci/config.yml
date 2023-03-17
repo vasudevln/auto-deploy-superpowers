@@ -51,11 +51,11 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: Test backend
       - restore_cache:
           keys:
             - backend-build
+      - run:
+          name: Test backend
           command: |
             cd backend
             npm install
@@ -65,6 +65,9 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - backend-build
       - run:
           name: Scan frontend
           command: |
@@ -76,6 +79,9 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - backend-build
       - run:
           name: Scan backend
           command: |
