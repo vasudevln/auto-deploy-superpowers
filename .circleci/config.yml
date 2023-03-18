@@ -104,7 +104,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run: yum -y install tar unzip
+      - run: yum -y install tar gzip
       - run:
           name: Ensure backend infrastructure exist
           command: |
@@ -117,7 +117,7 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             echo "[all]" > inventory.txt
-            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID} --output text >> inventory.txt
+            aws ec2 describe-instances --query=Reservations[].Instances[].PublicIpAddress --filters "Name=tag:project,Values=udapeople" --output text >> inventory.txt
             cat inventory.txt
       - persist_to_workspace:
           root: ~/
