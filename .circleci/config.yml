@@ -130,7 +130,7 @@ jobs:
             aws ec2 describe-instances --query=Reservations[*].Instances[*].PublicIpAddress --filters "Name=tag:project,Values=udapeople" --output text >> inventory
             cat inventory
       - persist_to_workspace:
-          root: /root
+          root: ~/
           paths:
             - project/.circleci/ansible/inventory
       - destroy-environment
@@ -143,7 +143,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["49:2f:86:6a:c8:e8:ac:20:61:b4:34:87:a9:ac:45:8a"]
       - attach_workspace:
-          at: /root/project/.circleci/ansible
+          at: ~/
       - run:
           name: Install dependencies
           command: |
