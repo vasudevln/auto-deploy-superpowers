@@ -120,9 +120,10 @@ jobs:
             aws ec2 describe-instances --query=Reservations[*].Instances[*].PublicIpAddress --filters "Name=tag:project,Values=udapeople" --output text >> inventory.txt
             cat inventory.txt
       - persist_to_workspace:
-          root: ~/
+          root: /temp
           paths:
             - inventory.txt
+      - destroy-environment
 
 # Orchestrate our job run sequence
 workflows:
