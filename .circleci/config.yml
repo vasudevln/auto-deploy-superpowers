@@ -128,9 +128,9 @@ jobs:
             pwd
             ls
       - persist_to_workspace:
-          root: ~/project
+          root: /root
           paths:
-            - ansible/inventory.txt
+            - project/.circleci/ansible/inventory.txt
       - destroy-environment
 
 # Orchestrate our job run sequence
