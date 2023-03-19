@@ -187,10 +187,7 @@ jobs:
           name: Run migrations
           command: |
             sudo apt update
-            sudo apt install -y tar gzip curl
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            sudo apt install -y tar gzip curl awscli
             aws --version
             cd backend
             npm install
@@ -200,7 +197,7 @@ jobs:
           command: |   
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl https://kvdb.io/REhawtxA3zb3YUJiGtCh16/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl --insecure https://kvdb.io/REhawtxA3zb3YUJiGtCh16/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
       - destroy-environment
       - revert-migrations
