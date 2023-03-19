@@ -198,7 +198,6 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               curl --insecure https://kvdb.io/REhawtxA3zb3YUJiGtCh16/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-              curl --insecure https://kvdb.io/REhawtxA3zb3YUJiGtCh16/migration_${CIRCLE_WORKFLOW_ID:0:7}
               fi
       - destroy-environment
       - revert-migrations
@@ -280,14 +279,11 @@ jobs:
           command: |
             apk --no-cache add curl nodejs npm
             pip install awscli
-            aws --version
-      - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query=Reservations[*].Instances[*].PublicIpAddress --filters "Name=tag:project,Values=udapeople" --output text)
+            aws --version 
       - run:
           name: Backend smoke test.
           command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query=Reservations[*].Instances[*].PublicIpAddress --filters "Name=tag:project,Values=udapeople" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
