@@ -27,7 +27,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl https://kvdb.io/REhawtxA3zb3YUJiGtCh16/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS=$(curl --insecure https://kvdb.io/REhawtxA3zb3YUJiGtCh16/migration_${CIRCLE_WORKFLOW_ID:0:7})
             SUCCESS = 1
             if(( $SUCCESS==1 )); 
             then
@@ -180,11 +180,18 @@ jobs:
      - image: circleci/node:13.8.0
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
+      - restore_cache:
+          keys:
+            - backend-build
       - run:
           name: Run migrations
           command: |
+            sudo apt update
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            aws --version
             cd backend
             npm install
             npm run migrations > migrations_dump.txt
@@ -213,6 +220,7 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+            aws --version
       - run:
           name: Get backend url
           command: |
@@ -229,6 +237,29 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy-environment
+      - revert-migrations
+
+  deploy-backend:
+    docker:
+    - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["49:2f:86:6a:c8:e8:ac:20:61:b4:34:87:a9:ac:45:8a"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible 
+            apk --no-cache add tar gzip
+            pip install awscli
+            aws --version
+      - run:
+          name: Deploy backend
+          command: |
+            # your code here
       - destroy-environment
       - revert-migrations
 
@@ -252,3 +283,7 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
