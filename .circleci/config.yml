@@ -325,7 +325,7 @@ jobs:
       steps:
         - checkout
         - run:
-            name: Get old stack workflow id
+            name: Get old stack workflow id and Remove old stacks and files
             command: |
                export OldWorkflowID=$(aws cloudformation \
                          list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
